@@ -1,4 +1,4 @@
-package com.example.customer.hello.api;
+package com.example.customer.api;
 
 import akka.Done;
 import akka.NotUsed;
@@ -10,46 +10,39 @@ import com.lightbend.lagom.javadsl.api.broker.kafka.KafkaProperties;
 
 import static com.lightbend.lagom.javadsl.api.Service.*;
 
-/**
- * The Hello service interface.
- * <p>
- * This describes everything that Lagom needs to know about how to serve and
- * consume the Hello.
- */
-public interface HelloService extends Service {
+public interface CustomerService extends Service {
 
     /**
-     * Example: curl http://localhost:9000/api/hello/Alice
+     * Example: curl http://localhost:9000/api/get_customer/Alice
      */
-    ServiceCall<NotUsed, String> hello(String id);
+    ServiceCall<NotUsed, String> get_customer(String id);
 
 
     /**
      * Example: curl -H "Content-Type: application/json" -X POST -d '{"message":
-     * "Hi"}' http://localhost:9000/api/hello/Alice
+     * "hi_alice"}' http://localhost:9000/api/create_customer/Alice
      */
-    ServiceCall<GreetingMessage, Done> useGreeting(String id);
-
+    ServiceCall<CustomerMessage, Done> create_customer(String id);
 
     /**
      * This gets published to Kafka.
      */
-    Topic<HelloEvent> helloEvents();
+    Topic<CustomerEvent> customerEvents();
 
     @Override
     default Descriptor descriptor() {
         // @formatter:off
-        return named("hello").withCalls(
-                pathCall("/api/hello/:id", this::hello),
-                pathCall("/api/hello/:id", this::useGreeting)
+        return named("customer").withCalls(
+                pathCall("/api/customer/:id", this::get_customer),
+                pathCall("/api/customer/:id", this::create_customer)
         ).withTopics(
-                topic("hello-events", this::helloEvents)
+                topic("customer-events", this::customerEvents)
                         // Kafka partitions messages, messages within the same partition will
                         // be delivered in order, to ensure that all messages for the same user
                         // go to the same partition (and hence are delivered in order with respect
                         // to that user), we configure a partition key strategy that extracts the
                         // name as the partition key.
-                        .withProperty(KafkaProperties.partitionKeyStrategy(), HelloEvent::getName)
+                        .withProperty(KafkaProperties.partitionKeyStrategy(), CustomerEvent::getName)
         ).withAutoAcl(true);
         // @formatter:on
     }

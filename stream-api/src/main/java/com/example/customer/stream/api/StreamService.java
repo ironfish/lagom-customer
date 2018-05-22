@@ -17,19 +17,8 @@ import com.lightbend.lagom.javadsl.api.ServiceCall;
  */
 public interface StreamService extends Service {
 
-  /**
-   * This stream is implemented by asking the hello service directly to say
-   * hello to each passed in name. It requires the hello service to be up
-   * and running to function.
-   */
   ServiceCall<Source<String, NotUsed>, Source<String, NotUsed>> directStream();
 
-  /**
-   * This stream is implemented autonomously, it uses its own store, populated
-   * by subscribing to the events published by the hello service, to say hello
-   * to each passed in name. It can function even when the hello service is
-   * down.
-   */
   ServiceCall<Source<String, NotUsed>, Source<String, NotUsed>> autonomousStream();
 
   @Override

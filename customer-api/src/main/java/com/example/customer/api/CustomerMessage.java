@@ -1,4 +1,4 @@
-package com.example.customer.hello.api;
+package com.example.customer.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -7,12 +7,12 @@ import lombok.Value;
 
 @Value
 @JsonDeserialize
-public final class GreetingMessage {
+public class CustomerMessage {
 
     public final String message;
 
     @JsonCreator
-    public GreetingMessage(String message) {
+    public CustomerMessage(String message) {
         this.message = Preconditions.checkNotNull(message, "message");
     }
 }
