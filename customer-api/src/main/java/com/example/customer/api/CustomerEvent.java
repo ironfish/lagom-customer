@@ -8,7 +8,7 @@ import lombok.Value;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = com.example.customer.hello.api.HelloEvent.GreetingMessageChanged.class, name = "greeting-message-changed")
+        @JsonSubTypes.Type(value = com.example.customer.api.CustomerEvent.CustomerCreated.class, name = "customer-created")
 })
 public interface CustomerEvent {
 
