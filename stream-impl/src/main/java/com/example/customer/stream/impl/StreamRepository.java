@@ -28,7 +28,7 @@ public class StreamRepository {
     // with an exception, then reinitialise the session and attempt to create the tables
     if (initialisedSession == null || initialisedSession.isCompletedExceptionally()) {
       initialisedSession = uninitialisedSession.executeCreateTable(
-          "CREATE TABLE IF NOT EXISTS greeting_message (name text PRIMARY KEY, message text)"
+          "CREATE TABLE IF NOT EXISTS customer (name text PRIMARY KEY, message text)"
       ).thenApply(done -> uninitialisedSession).toCompletableFuture();
     }
     return initialisedSession;
@@ -36,14 +36,14 @@ public class StreamRepository {
 
   public CompletionStage<Done> updateMessage(String name, String message) {
     return session().thenCompose(session ->
-        session.executeWrite("INSERT INTO greeting_message (name, message) VALUES (?, ?)",
+        session.executeWrite("INSERT INTO customer (name, message) VALUES (?, ?)",
             name, message)
     );
   }
 
   public CompletionStage<Optional<String>> getMessage(String name) {
     return session().thenCompose(session ->
-        session.selectOne("SELECT message FROM greeting_message WHERE name = ?", name)
+        session.selectOne("SELECT message FROM customer WHERE name = ?", name)
     ).thenApply(maybeRow -> maybeRow.map(row -> row.getString("message")));
   }
 }
