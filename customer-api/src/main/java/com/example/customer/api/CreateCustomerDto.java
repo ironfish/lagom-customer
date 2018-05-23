@@ -1,25 +1,25 @@
-package com.example.customer.impl;
+package com.example.customer.api;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.lightbend.lagom.serialization.CompressedJsonable;
+import lombok.Value;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
 
 import javax.annotation.concurrent.Immutable;
 
-@SuppressWarnings("serial")
+/**
+ * The DTO for creating customer as payload to POST or streaming in.
+ */
 @Value
 @Builder
 @Immutable
 @JsonDeserialize
 @AllArgsConstructor
-public class CustomerState implements CompressedJsonable {
+public class CreateCustomerDto {
 
     String lastName;
     String firstName;
     String initial;
     String dateOfBirth;
     Integer creditLimit;
-    String timestamp;
 }

@@ -12,17 +12,33 @@ public class CustomerEntity extends PersistentEntity<CustomerCommand, CustomerEv
     public Behavior initialBehavior(Optional<CustomerState> snapshotState) {
 
         BehaviorBuilder b = newBehaviorBuilder(
-                snapshotState.orElse(new CustomerState("Welcome", LocalDateTime.now().toString())));
+                snapshotState.orElse(new CustomerState(
+                        "",
+                        "",
+                        "",
+                        "",
+                        0,
+                        LocalDateTime.now().toString())));
 
         b.setCommandHandler(CustomerCommand.CreateCustomer.class, (cmd, ctx) ->
-                ctx.thenPersist(new CustomerEvent.CustomerCreated(entityId(), cmd.message),
+                ctx.thenPersist(new CustomerEvent.CustomerCreated(
+                                cmd.getLastName(),
+                                cmd.getFirstName(),
+                                cmd.getInitial(),
+                                cmd.getDateOfBirth(),
+                                cmd.getCreditLimit(),
+                                "todo"),
                         evt -> ctx.reply(Done.getInstance())));
 
         b.setEventHandler(CustomerEvent.CustomerCreated.class,
-                evt -> new CustomerState(evt.message, LocalDateTime.now().toString()));
-
-        b.setReadOnlyCommandHandler(CustomerCommand.GetCustomer.class,
-                (cmd, ctx) -> ctx.reply(state().message + ", " + cmd.name + "!"));
+                evt -> new CustomerState(
+                        evt.getLastName(),
+                        evt.getFirstName(),
+                        evt.getInitial(),
+                        evt.getDateOfBirth(),
+                        evt.getCreditLimit(),
+                        LocalDateTime.now().toString())
+        );
 
         return b.build();
     }
