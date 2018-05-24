@@ -1,9 +1,10 @@
 package com.example.customer.api;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.Value;
+import com.lightbend.lagom.serialization.Jsonable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Value;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -15,11 +16,12 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 @JsonDeserialize
 @AllArgsConstructor
-public class CreateCustomerDto {
+public class CustomerDto implements Jsonable {
 
     String lastName;
     String firstName;
     String initial;
     String dateOfBirth;
     Integer creditLimit;
+    String timestamp;
 }
