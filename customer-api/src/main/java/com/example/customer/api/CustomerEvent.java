@@ -1,35 +1,43 @@
 package com.example.customer.api;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.lightbend.lagom.javadsl.persistence.AggregateEvent;
+import com.lightbend.lagom.javadsl.persistence.AggregateEventShards;
+import com.lightbend.lagom.javadsl.persistence.AggregateEventTag;
+import com.lightbend.lagom.javadsl.persistence.AggregateEventTagger;
+import com.lightbend.lagom.serialization.Jsonable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 
 import javax.annotation.concurrent.Immutable;
-import java.util.UUID;
 
 /**
- * The Customer Event interface, wrapping implementations.
+ * Wrapping interface for all customer event impls.
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = com.example.customer.api.CustomerEvent.CustomerCreated.class, name = "customer-created")
-})
-public interface CustomerEvent {
+public interface CustomerEvent extends Jsonable, AggregateEvent<CustomerEvent> {
 
+    AggregateEventShards<CustomerEvent> TAG =
+            AggregateEventTag.sharded(CustomerEvent.class, 4);
+
+    @Override
+    default AggregateEventTagger<CustomerEvent> aggregateTag() {
+        return TAG;
+    }
+
+    @SuppressWarnings("serial")
     @Value
     @Builder
     @Immutable
     @JsonDeserialize
     @AllArgsConstructor
-    final class CustomerCreated implements CustomerEvent {
+    class CustomerCreated implements CustomerEvent {
+
         String lastName;
         String firstName;
         String initial;
         String dateOfBirth;
-        Integer creditLimit = 0;
-        String customerId = UUID.randomUUID().toString();
+        Integer creditLimit;
+        String timestamp;
     }
 }

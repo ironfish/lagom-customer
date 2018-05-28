@@ -1,9 +1,11 @@
 package com.example.customer.impl;
 
-import akka.Done;
-import com.example.customer.api.CreateCustomerDto;
+import akka.NotUsed;
+import com.example.customer.api.CustomerCommand;
+import com.example.customer.api.CustomerDto;
 import com.example.customer.api.CustomerService;
 import com.lightbend.lagom.javadsl.api.ServiceCall;
+import com.lightbend.lagom.javadsl.api.transport.NotFound;
 import com.lightbend.lagom.javadsl.persistence.PersistentEntityRef;
 import com.lightbend.lagom.javadsl.persistence.PersistentEntityRegistry;
 
@@ -24,15 +26,31 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ServiceCall<CreateCustomerDto, Done> createCustomer() {
-        return dto -> {
+    public ServiceCall<CustomerCommand.CreateCustomer, String> createCustomer() {
+        return command -> {
+
+            String customerId = UUID.randomUUID().toString();
+
             // Tell the entity to use the greeting message specified.
-            return newEntityRef().ask(new CustomerCommand.CreateCustomer(
-                    dto.getLastName(),
-                    dto.getFirstName(),
-                    dto.getInitial(),
-                    dto.getDateOfBirth(),
-                    dto.getCreditLimit()));
+            return entityRef(customerId).ask(new CustomerCommand.CreateCustomer(
+                    customerId,
+                    command.getLastName(),
+                    command.getFirstName(),
+                    command.getInitial(),
+                    command.getDateOfBirth(),
+                    command.getCreditLimit())).thenApply( customer -> customerId);
+        };
+    }
+
+    @Override
+    public ServiceCall<NotUsed, CustomerDto> getCustomer(String customerId) {
+        return request -> {
+            return entityRef(customerId).ask(new CustomerCommand.GetCustomer()).thenApply(reply -> {
+                if (reply.dto.isPresent())
+                    return reply.dto.get();
+                else
+                    throw new NotFound("customer " + customerId + " not found");
+            });
         };
     }
 
@@ -40,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
      * Create a new entity reference, generating a unique customer id.
      * @return
      */
-    private PersistentEntityRef<CustomerCommand> newEntityRef() {
-        return persistentEntityRegistry.refFor(CustomerEntity.class, UUID.randomUUID().toString());
+    private PersistentEntityRef<CustomerCommand> entityRef(String customerId) {
+        return persistentEntityRegistry.refFor(CustomerEntity.class, customerId);
     }
 }

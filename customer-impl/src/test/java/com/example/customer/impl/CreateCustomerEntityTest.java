@@ -3,6 +3,8 @@
 //import akka.Done;
 //import akka.actor.ActorSystem;
 //import akka.testkit.JavaTestKit;
+//import com.example.customer.api.CustomerCommand;
+//import com.example.customer.api.CustomerEvent;
 //import com.lightbend.lagom.javadsl.testkit.PersistentEntityTestDriver;
 //import org.junit.AfterClass;
 //import org.junit.BeforeClass;

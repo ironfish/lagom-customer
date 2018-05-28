@@ -1,32 +1,35 @@
 package com.example.customer.impl;
 
-import com.example.customer.api.CreateCustomerDto;
+import com.example.customer.api.CustomerCommand;
+import com.example.customer.api.CustomerDto;
 import com.example.customer.api.CustomerService;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import static com.lightbend.lagom.javadsl.testkit.ServiceTest.defaultSetup;
 import static com.lightbend.lagom.javadsl.testkit.ServiceTest.withServer;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.Assert.assertEquals;
 
 public class CustomerServiceTest {
     @Test
     public void shouldStoreCustomer() throws Exception {
         withServer(defaultSetup().withCassandra(), server -> {
+
             CustomerService service = server.client(CustomerService.class);
 
-//            String msg1 = service.get_customer("Alice").invoke().toCompletableFuture().get(5, SECONDS);
-//            assertEquals("Welcome, Alice!", msg1);
+            String customerId = service.createCustomer().invoke(new CustomerCommand.CreateCustomer("",
+                    "Doe", "John","D","1970-01-01", 2000)
+            ).toCompletableFuture().get(5, SECONDS);
 
-            CreateCustomerDto newCustomer = new CreateCustomerDto("DOE", "John", "D",
-                    "1970-01-01", 2000);
-            service.createCustomer().invoke(newCustomer).toCompletableFuture().get(5, SECONDS);
 
-//            String msg2 = service.get_customer("Alice").invoke().toCompletableFuture().get(5, SECONDS);
-//            assertEquals("Hi, Alice!", msg2);
+            CustomerDto customer = service.getCustomer(customerId).invoke().
+                    toCompletableFuture().get(5, SECONDS);
 
-//            String msg3 = service.get_customer("Bob").invoke().toCompletableFuture().get(5, SECONDS);
-//            assertEquals("Welcome, Bob!", msg3);
+            assertEquals("Doe", customer.getLastName());
+            assertEquals("John", customer.getFirstName());
+            assertEquals("D", customer.getInitial());
+            assertEquals("1970-01-01", customer.getDateOfBirth());
+            assertEquals("2000", customer.getCreditLimit().toString());
         });
     }
 }
